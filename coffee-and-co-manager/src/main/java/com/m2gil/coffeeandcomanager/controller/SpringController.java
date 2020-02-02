@@ -17,7 +17,7 @@ public class SpringController {
 	@GetMapping()
     public ResponseEntity<UserDTO> getUserDTO(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	UserDTO dto = new UserDTO(user.getUsername(), user.getPassword(), user.getRole());
+    	UserDTO dto = new UserDTO(user.getEmail(), user.getUsername(), user.getPassword(), user.getRole());
     	return  new ResponseEntity<UserDTO>(dto, HttpStatus.OK);
     }
 	

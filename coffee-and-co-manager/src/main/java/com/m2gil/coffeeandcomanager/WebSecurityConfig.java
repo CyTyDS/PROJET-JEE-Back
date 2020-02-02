@@ -15,6 +15,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -39,7 +41,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf()
                 .disable()
                 .exceptionHandling()
@@ -51,6 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationProvider(this.getProvider())
                 .formLogin()
                 .loginProcessingUrl("/login")
+                .usernameParameter("email")
                 .successHandler(new AuthentificationLoginSuccessHandler())
                 .failureHandler(new SimpleUrlAuthenticationFailureHandler())
                 .and()
@@ -62,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/logout").permitAll()
-                .antMatchers("/user").authenticated()
+                .antMatchers("/user/**").authenticated()
                 .anyRequest().permitAll();
     }
 
@@ -85,10 +87,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
+    
+    //TODO SET ENCODER ON AUTHENTIFICATION
     @Bean
     public AuthenticationProvider getProvider() {
         AppAuthProvider provider = new AppAuthProvider();
         provider.setUserDetailsService(userDetailsService);
+        /*NEW*/ provider.setPasswordEncoder(passwordEncoder());
         return provider;
+    }
+    
+    //NEW
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+    	return new BCryptPasswordEncoder();
     }
 }

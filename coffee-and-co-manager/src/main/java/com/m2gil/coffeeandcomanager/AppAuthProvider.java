@@ -19,9 +19,13 @@ public class AppAuthProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
         String name = auth.getName();
-        String password = auth.getCredentials()
-                .toString();
+        String password = auth.getCredentials().toString();
+        // NEW
+//        String password = this.getPasswordEncoder().encode(
+//        		auth.getCredentials().toString());
         UserDetails user = userDetailsService.loadUserByUsername(name);
+        System.out.println(password);
+        System.out.println(user.getPassword());
         if (user == null) {
             throw new BadCredentialsException("User not found " + auth.getPrincipal());
         } else if (! user.getPassword().equals(password)) {
