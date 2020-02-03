@@ -73,6 +73,6 @@ public class UserService implements UserDetailsService {
     }
     
     private boolean nameExists(final String name) {
-        return userRepository.findUserWithName(name) != null;
+        return userRepository.findByUsername(name) != null;
     }
 }

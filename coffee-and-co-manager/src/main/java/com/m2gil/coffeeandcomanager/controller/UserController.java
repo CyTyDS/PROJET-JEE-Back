@@ -56,11 +56,9 @@ public class UserController {
     private UserRepository userRepository;
     
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) throws Exception {
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
     	// Test admin
-    	//TODO role != admin
-    	User me = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	if (me.getRole().equals("admin")) {
+    	if (! ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRole().equals("admin")) {
     		return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
     	}
     	
@@ -87,19 +85,17 @@ public class UserController {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
     	}
     	if (user.getRole() == null 
-    			|| !user.getRole().equals("admin") 
-    			|| !user.getRole().equals("user")) {
+    			|| (!user.getRole().equals("admin") 
+    			&& !user.getRole().equals("user"))) {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
     	}
     	
     	// Testing if user already exists
     	if (emailExists(user.getEmail())) {
-            throw new Exception(
-              "There is an account with that email adress:" + user.getEmail());
+    		return new ResponseEntity<String>(HttpStatus.CONFLICT);
         }
         if (nameExists(user.getUsername())) {
-            throw new Exception(
-              "There is an account with that username:" + user.getUsername());
+        	return new ResponseEntity<String>(HttpStatus.CONFLICT);
         }
         
         // Hashing password
@@ -116,6 +112,6 @@ public class UserController {
     }
     
     private boolean nameExists(final String name) {
-        return userRepository.findUserWithName(name) != null;
+        return userRepository.findByUsername(name) != null;
     }
 }
