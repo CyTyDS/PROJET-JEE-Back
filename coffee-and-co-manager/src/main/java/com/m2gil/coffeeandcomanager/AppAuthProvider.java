@@ -7,7 +7,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import com.m2gil.coffeeandcomanager.credentials.UserService;
 
 public class AppAuthProvider extends DaoAuthenticationProvider {
@@ -24,11 +23,9 @@ public class AppAuthProvider extends DaoAuthenticationProvider {
 //        String password = this.getPasswordEncoder().encode(
 //        		auth.getCredentials().toString());
         UserDetails user = userDetailsService.loadUserByUsername(name);
-        System.out.println(password);
-        System.out.println(user.getPassword());
         if (user == null) {
             throw new BadCredentialsException("User not found " + auth.getPrincipal());
-        } else if (! user.getPassword().equals(password)) {
+        } else if (! this.getPasswordEncoder().matches(password, user.getPassword())) {
         	throw new BadCredentialsException("Username/Password does not match for " + auth.getPrincipal());
         }
         return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
