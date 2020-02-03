@@ -30,7 +30,15 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Objects.requireNonNull(email);
-        User user = userRepository.findUserWithName(email)
+        User user = userRepository.findUserWithEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return user;
+    }
+    
+    public UserDetails loadUserByRealUsername(String name) throws UsernameNotFoundException {
+        Objects.requireNonNull(name);
+        User user = userRepository.findUserWithEmail(name)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return user;
@@ -45,6 +53,11 @@ public class UserService implements UserDetailsService {
             throw new Exception(
               "There is an account with that email adress:" + accountDto.getEmail());
         }
+        if (nameExists(accountDto.getUsername())) {
+            throw new Exception(
+              "There is an account with that username:" + accountDto.getUsername());
+        }
+        
         User user = new User();
         user.setUsername(accountDto.getUsername());
          
@@ -57,5 +70,9 @@ public class UserService implements UserDetailsService {
     
     private boolean emailExists(final String email) {
         return userRepository.findByEmail(email) != null;
+    }
+    
+    private boolean nameExists(final String name) {
+        return userRepository.findUserWithName(name) != null;
     }
 }
