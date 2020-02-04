@@ -25,7 +25,7 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserDTO(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	UserDTO dto = new UserDTO(user.getEmail(), user.getUsername(), user.getPassword(), user.getRole());
-    	return  new ResponseEntity<UserDTO>(dto, HttpStatus.OK);
+    	return new ResponseEntity<UserDTO>(dto, HttpStatus.OK);
     }
 	
 	@GetMapping("/list")
@@ -43,31 +43,31 @@ public class UserController {
     		lDTO.add(uDTO);
     	}
     	
-    	return  new ResponseEntity<List<UserDTO>>(lDTO, HttpStatus.OK);
+    	return new ResponseEntity<List<UserDTO>>(lDTO, HttpStatus.OK);
     }
 	
     @GetMapping("/info")
     public ResponseEntity<User> getUser(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	return  new ResponseEntity<User>(user, HttpStatus.OK);
+    	return new ResponseEntity<User>(user, HttpStatus.OK);
     }
     
     @GetMapping("/name")
     public ResponseEntity<String> getUserName(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	return  new ResponseEntity<String>(user.getUsername(), HttpStatus.OK);
+    	return new ResponseEntity<String>(user.getUsername(), HttpStatus.OK);
     }
     
     @GetMapping("/password")
     public ResponseEntity<String> getUserPassword(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	return  new ResponseEntity<String>(user.getPassword(), HttpStatus.OK);
+    	return new ResponseEntity<String>(user.getPassword(), HttpStatus.OK);
     }
     
     @GetMapping("/role")
     public ResponseEntity<String> getUserRole(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	return  new ResponseEntity<String>(user.getRole(), HttpStatus.OK);
+    	return new ResponseEntity<String>(user.getRole(), HttpStatus.OK);
     }
     
     
@@ -101,6 +101,8 @@ public class UserController {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
     	}
     	// TODO Rule on password
+//    	Regex r = new Regex(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+//        if (!r.IsMatch(rm.Mdp))
     	if (user.getPassword() == null 
     			|| user.getPassword().equals("")) {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
@@ -149,6 +151,8 @@ public class UserController {
     		user.setUsername(userDB.getUsername());
     	}
     	// TODO Rule on password
+//    	Regex r = new Regex(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+//        if (!r.IsMatch(rm.Mdp))
     	if (! new BCryptPasswordEncoder().matches(userDB.getPassword(), user.getPassword())) {
     		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
     	}
