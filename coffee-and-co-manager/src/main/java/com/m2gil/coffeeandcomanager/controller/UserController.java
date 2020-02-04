@@ -33,7 +33,6 @@ public class UserController {
 	@GetMapping("/list")
     public ResponseEntity<List<UserDTO>> getUserList(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	
     	if (! user.getRole().equals("admin")) {
     		return new ResponseEntity<List<UserDTO>>(HttpStatus.FORBIDDEN);
     	}
@@ -102,13 +101,14 @@ public class UserController {
     			|| user.getUsername().equals("")) {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
     	}
-    	// TODO Rule on password
-//    	Regex r = new Regex(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-//        if (!r.IsMatch(rm.Mdp))
     	if (user.getPassword() == null 
     			|| user.getPassword().equals("")) {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
     	}
+    	if (!user.getPassword().matches("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")) {
+    		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
+    	}
+
     	if (user.getRole() == null 
     			|| (!user.getRole().equals("admin") 
     			&& !user.getRole().equals("user"))) {
@@ -152,25 +152,27 @@ public class UserController {
     			|| user.getUsername().equals("")) {
     		user.setUsername(userDB.getUsername());
     	}
-    	// TODO Rule on password
-//    	Regex r = new Regex(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-//        if (!r.IsMatch(rm.Mdp))
-    	if (! new BCryptPasswordEncoder().matches(userDB.getPassword(), user.getPassword())) {
-    		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-    	}
+    	
     	if (user.getPassword() == null 
     			|| user.getPassword().equals("")) {
     		user.setPassword(userDB.getPassword());
+    	} else {
+    		if (!user.getPassword().matches("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")) {
+        		user.setPassword(userDB.getPassword());
+        	} else {
+        		if (! new BCryptPasswordEncoder().matches(user.getPassword(), userDB.getPassword())) {
+            		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+            	} else {
+            		user.setPassword(userDB.getPassword());
+            	}
+        	}
     	}
+    	
     	if (user.getRole() == null 
     			|| (!user.getRole().equals("admin") 
     			&& !user.getRole().equals("user"))) {
     		user.setRole(userDB.getRole());
     	}
-    	
-        if (nameExists(user.getUsername())) {
-        	return new ResponseEntity<String>(HttpStatus.CONFLICT);
-        }
         
         userRepository.delete(userDB);
     	userRepository.save(user);

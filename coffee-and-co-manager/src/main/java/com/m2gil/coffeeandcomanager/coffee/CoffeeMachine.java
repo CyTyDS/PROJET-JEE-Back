@@ -6,13 +6,13 @@ import java.util.Map;
 public class CoffeeMachine {
 
 	private List<Map<String, Integer>> products;
-	private int port;
+	private String port;
 	
-	public int getPort() {
+	public String getPort() {
 		return port;
 	}
 	
-	public void setPort(int port) {
+	public void setPort(String port) {
 		this.port = port;
 	}
 
