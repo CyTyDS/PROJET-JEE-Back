@@ -125,6 +125,69 @@ public class UserController {
     	return new ResponseEntity<String>(HttpStatus.OK);
     }
     
+    // We modify password according to email adress and the rest of the User body
+    @PostMapping("/modify")
+    public ResponseEntity<String> modifyUser(@RequestBody User user) {
+    	// Test admin
+    	if (! ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRole().equals("admin")) {
+    		return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+    	}
+    	
+    	//Test Body
+    	if (user == null) {
+    		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
+    	}
+    	
+    	// Test si déjà dans la BDD
+    	User userDB = userRepository.findByEmail(user.getEmail());
+    	if (userDB == null) {
+    		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+    	
+    	if (user.getUsername() == null 
+    			|| user.getUsername().equals("")) {
+    		user.setUsername(userDB.getUsername());
+    	}
+    	// TODO Rule on password
+    	if (! new BCryptPasswordEncoder().matches(userDB.getPassword(), user.getPassword())) {
+    		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+    	}
+    	if (user.getPassword() == null 
+    			|| user.getPassword().equals("")) {
+    		user.setPassword(userDB.getPassword());
+    	}
+    	if (user.getRole() == null 
+    			|| (!user.getRole().equals("admin") 
+    			&& !user.getRole().equals("user"))) {
+    		user.setRole(userDB.getRole());
+    	}
+    	
+        if (nameExists(user.getUsername())) {
+        	return new ResponseEntity<String>(HttpStatus.CONFLICT);
+        }
+        
+        userRepository.delete(userDB);
+    	userRepository.save(user);
+    	return new ResponseEntity<String>(HttpStatus.OK);
+    }
+    
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestBody String email) {
+    	// Test admin
+    	if (! ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRole().equals("admin")) {
+    		return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+    	}
+    	
+    	// Test si dans la BDD
+    	User userDB = userRepository.findByEmail(email);
+    	if (userDB == null) {
+    		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+    	}
+        
+        userRepository.delete(userDB);
+    	return new ResponseEntity<String>(HttpStatus.OK);
+    }
+    
     
     //OUTILS
     
