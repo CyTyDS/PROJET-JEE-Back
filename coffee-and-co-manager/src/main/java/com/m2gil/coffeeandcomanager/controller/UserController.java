@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.m2gil.coffeeandcomanager.credentials.User;
 import com.m2gil.coffeeandcomanager.credentials.UserDTO;
 import com.m2gil.coffeeandcomanager.repo.UserRepository;
+import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -24,6 +26,24 @@ public class UserController {
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	UserDTO dto = new UserDTO(user.getEmail(), user.getUsername(), user.getPassword(), user.getRole());
     	return  new ResponseEntity<UserDTO>(dto, HttpStatus.OK);
+    }
+	
+	@GetMapping("/list")
+    public ResponseEntity<List<UserDTO>> getUserList(){
+    	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	
+    	if (! user.getRole().equals("admin")) {
+    		return new ResponseEntity<List<UserDTO>>(HttpStatus.FORBIDDEN);
+    	}
+    	
+    	List<User> l = userRepository.findAll();
+    	List<UserDTO> lDTO = new LinkedList<UserDTO>();
+    	for (User u : l) {
+    		UserDTO uDTO = new UserDTO(u.getEmail(), u.getUsername(), u.getPassword(), u.getRole());
+    		lDTO.add(uDTO);
+    	}
+    	
+    	return  new ResponseEntity<List<UserDTO>>(lDTO, HttpStatus.OK);
     }
 	
     @GetMapping("/info")
@@ -80,6 +100,7 @@ public class UserController {
     			|| user.getUsername().equals("")) {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
     	}
+    	// TODO Rule on password
     	if (user.getPassword() == null 
     			|| user.getPassword().equals("")) {
     		return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
