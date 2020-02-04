@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -128,7 +130,7 @@ public class UserController {
     }
     
     // We modify password according to email adress and the rest of the User body
-    @PostMapping("/modify")
+    @PutMapping("/modify")
     public ResponseEntity<String> modifyUser(@RequestBody User user) {
     	// Test admin
     	if (! ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRole().equals("admin")) {
@@ -175,7 +177,7 @@ public class UserController {
     	return new ResponseEntity<String>(HttpStatus.OK);
     }
     
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(@RequestBody String email) {
     	// Test admin
     	if (! ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRole().equals("admin")) {
