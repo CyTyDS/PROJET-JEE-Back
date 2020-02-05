@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -84,6 +85,30 @@ public class CoffeeController {
 		
 		this.whitelist.add(machineName);
 		
+    	return new ResponseEntity<String>(HttpStatus.OK);
+    }
+	
+	@GetMapping("/getConfig/{machineName}")
+    public ResponseEntity<String> getConfigFrom(@PathVariable String machineName) {
+		String url = "http://" + machineName + "/config";
+	    
+    	return new RestTemplateBuilder().build().exchange(url, HttpMethod.GET, null, String.class);
+    }
+	
+	@PostMapping("/setConfig/{machineName}")
+    public ResponseEntity<String> setConfigTo(@PathVariable String machineName, @RequestBody String mConf) {
+		String url = "http://" + machineName + "/config";
+		
+	    // build the request
+	    HttpEntity<String> entity = new HttpEntity<>(mConf);
+
+	    // send POST request
+	    ResponseEntity<String> response = new RestTemplateBuilder().build().postForEntity(url, entity, String.class);
+		
+	    if (response.getStatusCode() != HttpStatus.OK) {
+	    	return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+	    }
+	    
     	return new ResponseEntity<String>(HttpStatus.OK);
     }
 	
