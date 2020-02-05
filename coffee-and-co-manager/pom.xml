@@ -10,6 +10,7 @@
 	</parent>
 	<groupId>com.m2gil</groupId>
 	<artifactId>coffee-and-co-manager</artifactId>
+	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>coffee-and-co-manager</name>
 	<description>Projet incroyable permettant la gestion de machine à café.</description>

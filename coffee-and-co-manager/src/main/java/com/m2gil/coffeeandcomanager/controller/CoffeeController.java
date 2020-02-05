@@ -1,6 +1,8 @@
 package com.m2gil.coffeeandcomanager.controller;
 
 import com.m2gil.coffeeandcomanager.coffee.CoffeeMachine;
+import com.m2gil.coffeeandcomanager.credentials.User;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CoffeeController {
 
 	private Map<String, CoffeeMachine> coffeeMap = new HashMap<String, CoffeeMachine>();
-	private List<String> blacklist = new LinkedList<String>();
+	private List<String> whitelist = new LinkedList<String>();
 	
 	@GetMapping()
     public ResponseEntity<List<CoffeeMachine>> getAllMachines(){
@@ -52,13 +55,12 @@ public class CoffeeController {
 		}
 		
 		String host = request.getRemoteAddr() + ":" + cm.getPort();
-	    System.out.println(host);
 	    
 		if (host == null || host.equals("")) {
 			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
 		}
 		
-		if (this.blacklist.contains(host)) {
+		if (! this.whitelist.contains(host)) {
 			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
 		}
 		
@@ -68,19 +70,35 @@ public class CoffeeController {
     	return new ResponseEntity<String>(HttpStatus.OK);
     }
 	
-	// Remove machine
-	@DeleteMapping()
-    public ResponseEntity<String> blacklistMachine(@RequestBody String machineName){
-		if (this.blacklist.contains(machineName)) {
+	// Add machine
+	@PostMapping("/addMachine")
+    public ResponseEntity<String> whitelistMachine(@RequestBody String machineName){
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	if (! user.getRole().equals("admin")) {
+    		return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+    	}
+		
+		if (this.whitelist.contains(machineName)) {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}
 		
-		System.out.println(machineName);
+		this.whitelist.add(machineName);
+		
+    	return new ResponseEntity<String>(HttpStatus.OK);
+    }
+	
+	// Remove machine
+	@DeleteMapping("/deleteMachine")
+    public ResponseEntity<String> deleteMachine(@RequestBody String machineName){
+		if (! this.whitelist.contains(machineName)) {
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}
+		
 		if (this.coffeeMap.get(machineName) == null) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 		
-		this.blacklist.add(machineName);
+		this.whitelist.remove(machineName);
 		
     	coffeeMap.remove(machineName);
     	return new ResponseEntity<String>(HttpStatus.OK);
