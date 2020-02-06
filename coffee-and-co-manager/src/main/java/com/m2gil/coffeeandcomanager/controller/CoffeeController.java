@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -39,8 +38,6 @@ public class CoffeeController {
 		
     	return new ResponseEntity<List<CoffeeMachine>>(new LinkedList<CoffeeMachine>(coffeeMap.values()), HttpStatus.OK);
     }
-	
-	
 	
 	// #####################  Machine #####################
 	
@@ -88,6 +85,23 @@ public class CoffeeController {
     	return new ResponseEntity<String>(HttpStatus.OK);
     }
 	
+	// Remove machine
+	@DeleteMapping("/deleteMachine")
+    public ResponseEntity<String> deleteMachine(@RequestBody String machineName){
+		if (! this.whitelist.contains(machineName)) {
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}
+		
+		if (this.coffeeMap.get(machineName) == null) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
+		
+		this.whitelist.remove(machineName);
+		
+    	coffeeMap.remove(machineName);
+    	return new ResponseEntity<String>(HttpStatus.OK);
+    }
+	
 	@GetMapping("/getConfig/{machineName}")
     public ResponseEntity<String> getConfigFrom(@PathVariable String machineName) {
 		String url = "http://" + machineName + "/config";
@@ -109,23 +123,6 @@ public class CoffeeController {
 	    	return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 	    }
 	    
-    	return new ResponseEntity<String>(HttpStatus.OK);
-    }
-	
-	// Remove machine
-	@DeleteMapping("/deleteMachine")
-    public ResponseEntity<String> deleteMachine(@RequestBody String machineName){
-		if (! this.whitelist.contains(machineName)) {
-			return new ResponseEntity<String>(HttpStatus.OK);
-		}
-		
-		if (this.coffeeMap.get(machineName) == null) {
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-		}
-		
-		this.whitelist.remove(machineName);
-		
-    	coffeeMap.remove(machineName);
     	return new ResponseEntity<String>(HttpStatus.OK);
     }
 	

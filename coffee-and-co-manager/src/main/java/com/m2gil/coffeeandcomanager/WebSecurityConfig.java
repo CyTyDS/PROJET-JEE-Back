@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
@@ -22,6 +23,9 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.m2gil.coffeeandcomanager.credentials.User;
+import com.m2gil.coffeeandcomanager.credentials.UserDTO;
 import com.m2gil.coffeeandcomanager.credentials.UserService;
 
 @Configuration
@@ -71,11 +75,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private class AuthentificationLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-
+    	
         @Override
         public void onAuthenticationSuccess(HttpServletRequest request,
                                             HttpServletResponse response, Authentication authentication)
                 throws IOException, ServletException {
+        	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        	ObjectMapper om = new ObjectMapper();
+        	response.getWriter().append(om.writeValueAsString(new UserDTO(user.getEmail(), user.getUsername(), user.getPassword(), user.getRole())));
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }
@@ -89,8 +96,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
-    
-    //TODO SET ENCODER ON AUTHENTIFICATION
     @Bean
     public AuthenticationProvider getProvider() {
         AppAuthProvider provider = new AppAuthProvider();
