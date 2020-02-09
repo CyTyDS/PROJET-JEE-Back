@@ -86,8 +86,8 @@ public class CoffeeController {
     }
 	
 	// Remove machine
-	@DeleteMapping("/deleteMachine")
-    public ResponseEntity<String> deleteMachine(@RequestBody String machineName){
+	@DeleteMapping("/deleteMachine/{machineName}")
+    public ResponseEntity<String> deleteMachine(@PathVariable String machineName){
 		if (! this.whitelist.contains(machineName)) {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}
