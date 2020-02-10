@@ -31,6 +31,24 @@ public class UserController {
     	return new ResponseEntity<UserDTO>(dto, HttpStatus.OK);
     }
 	
+	@GetMapping("/byName/{userName}")
+    public ResponseEntity<UserDTO> getUserDTOFromName(@PathVariable String userName){
+		User u = userRepository.findByUsername(userName);
+		if (u == null) {
+			return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+		}
+    	return new ResponseEntity<UserDTO>(new UserDTO(u.getEmail(), u.getUsername(), u.getPassword(), u.getRole()), HttpStatus.OK);
+    }
+	
+	@GetMapping("/byEmail/{userEmail}")
+    public ResponseEntity<UserDTO> getUserDTOFromEmail(@PathVariable String userEmail){
+		User u = userRepository.findByEmail(userEmail);
+		if (u == null) {
+			return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+		}
+    	return new ResponseEntity<UserDTO>(new UserDTO(u.getEmail(), u.getUsername(), u.getPassword(), u.getRole()), HttpStatus.OK);
+    }
+	
 	@GetMapping("/list")
     public ResponseEntity<List<UserDTO>> getUserList(){
     	User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
