@@ -106,7 +106,9 @@ public class CoffeeController {
     public ResponseEntity<String> getConfigFrom(@PathVariable String machineName) {
 		String url = "http://" + machineName + "/config";
 	    
-    	return new RestTemplateBuilder().build().exchange(url, HttpMethod.GET, null, String.class);
+		ResponseEntity<String> response = new RestTemplateBuilder().build().exchange(url, HttpMethod.GET, null, String.class);
+		
+    	return new ResponseEntity<String>(response.getBody(), HttpStatus.OK);
     }
 	
 	@PostMapping("/setConfig/{machineName}")
