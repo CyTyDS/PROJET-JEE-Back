@@ -16,19 +16,25 @@ class UserCreator {
 
     @PostConstruct
     public void init() {
-    	User one = new User();
-    	one.setEmail("admin@admin.fr");
-    	one.setUsername("admin");
-    	one.setPassword(new BCryptPasswordEncoder().encode("admin"));
-    	one.setRole("admin");
-        userRepository.save(one);
+    	if (userRepository.findByEmail("admin@admin.fr") == null) {
+    		System.out.println("Recreated standard admin");
+    		User one = new User();
+        	one.setEmail("admin@admin.fr");
+        	one.setUsername("admin");
+        	one.setPassword(new BCryptPasswordEncoder().encode("admin"));
+        	one.setRole("admin");
+        	userRepository.save(one);
+    	}
         
-        User two = new User();
-    	two.setEmail("user@user.fr");
-    	two.setUsername("user");
-    	two.setPassword(new BCryptPasswordEncoder().encode("user"));
-    	two.setRole("user");
-        userRepository.save(two);
+    	if (userRepository.findByEmail("user@user.fr") == null) {
+    		System.out.println("Recreated standard user");
+    		User two = new User();
+        	two.setEmail("user@user.fr");
+        	two.setUsername("user");
+        	two.setPassword(new BCryptPasswordEncoder().encode("user"));
+        	two.setRole("user");
+            userRepository.save(two);
+    	}
         // etc
     }
 }
