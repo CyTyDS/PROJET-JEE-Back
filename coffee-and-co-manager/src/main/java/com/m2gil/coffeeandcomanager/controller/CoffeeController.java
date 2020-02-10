@@ -144,7 +144,8 @@ public class CoffeeController {
 	    // send POST request
 	    ResponseEntity<String> response = new RestTemplateBuilder().build().postForEntity(url, entity, String.class);
 		
-	    if (response.getStatusCode() != HttpStatus.OK) {
+	    if (response.getStatusCode() != HttpStatus.OK
+	    		&& response.getStatusCode() != HttpStatus.CREATED) {
 	    	return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 	    }
 	    
@@ -165,7 +166,8 @@ public class CoffeeController {
 	    // send POST request
 	    ResponseEntity<String> response = new RestTemplateBuilder().build().exchange(url, HttpMethod.DELETE, entity, String.class);
 		
-	    if (response.getStatusCode() != HttpStatus.OK) {
+	    if (response.getStatusCode() != HttpStatus.OK
+	    		&& response.getStatusCode() != HttpStatus.CREATED) {
 	    	return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 	    }
 	    
@@ -186,7 +188,8 @@ public class CoffeeController {
 	    // send POST request
 	    ResponseEntity<String> response = new RestTemplateBuilder().build().postForEntity(url, entity, String.class);
 		
-	    if (response.getStatusCode() != HttpStatus.OK) {
+	    if (response.getStatusCode() != HttpStatus.OK
+	    		&& response.getStatusCode() != HttpStatus.CREATED) {
 	    	return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 	    }
 	    
@@ -207,7 +210,8 @@ public class CoffeeController {
 	    // send POST request
 	    ResponseEntity<String> response = new RestTemplateBuilder().build().exchange(url, HttpMethod.DELETE, entity, String.class);
 		
-	    if (response.getStatusCode() != HttpStatus.OK) {
+	    if (response.getStatusCode() != HttpStatus.OK
+	    		&& response.getStatusCode() != HttpStatus.CREATED) {
 	    	return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 	    }
 	    
